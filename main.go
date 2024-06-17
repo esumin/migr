@@ -62,8 +62,17 @@ func TraverseAndModifyFiles(root string, matchers []matcher.Matcher) {
 }
 
 func main() {
+	matchers := []matcher.Matcher{
+		matcher.MatchErrorfWithNamedParams,
+		matcher.MatchWrapfWithNamedParams,
+		matcher.MatchWrapfStderr,
+		matcher.MatchSimpleWraps,
+		matcher.MatchSimpleErrorsNew,
+		matcher.MatchImport,
+	}
+
 	TraverseAndModifyFiles(
-		"./",
-		matcher.AllMatchers,
+		"/Users/eugen.sumin/git/kanister/pkg/blockstorage",
+		matchers,
 	)
 }

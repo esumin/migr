@@ -82,7 +82,7 @@ func TestMatchers(t *testing.T) {
 		//	out:     "errkit.Wrap(err, \"foo\", \"stderr\", stderr)",
 		//},
 		//{
-		//	comment: quicktest.Commentf("Simple errors.Wrapf with stderr `5"),
+		//	comment: quicktest.Commentf("Simple errors.Wrapf with stderr 5"),
 		//	in:      "errors.Wrapf(err, \"foo. %s \", stderr)",
 		//	out:     "errkit.Wrap(err, \"foo\", \"stderr\", stderr)",
 		//},
@@ -102,7 +102,7 @@ func TestMatchers(t *testing.T) {
 		//	out:     "errkit.Wrap(err, \"Error foo.\", \"stderr\", stderr)",
 		//},
 		//{
-		//	comment: quicktest.Commentf("Simple errors.Wrapf with stderr 8"),
+		//	comment: quicktest.Commentf("Simple errors.Wrapf with stderr 9"),
 		//	in:      "errors.Wrapf(err, \"Error %s, foo.\", stderr)",
 		//	out:     "errkit.Wrap(err, \"Error foo.\", \"stderr\", stderr)",
 		//},
@@ -116,11 +116,16 @@ func TestMatchers(t *testing.T) {
 		//	in:      "\treturn errors.Wrapf(err, \"foo. %s app=%s\", stderr, cb.name)",
 		//	out:     "\treturn errkit.Wrap(err, \"foo\", \"stderr\", stderr, \"app\", cb.name)",
 		//},
-		{
-			comment: quicktest.Commentf("Simple errors.Wrapf with stderr and stdout"),
-			in:      "\treturn errors.Wrapf(err, \"Error %s, foo. stdout is %s\", stderr, stdout)",
-			out:     "\treturn errkit.Wrap(err, \"Error foo.\", \"stdout\", stdout, \"stderr\", stderr)",
-		},
+		//{
+		//	comment: quicktest.Commentf("Simple errors.Wrapf with stderr and stdout"),
+		//	in:      "\treturn errors.Wrapf(err, \"Error %s, foo. stdout is %s\", stderr, stdout)",
+		//	out:     "\treturn errkit.Wrap(err, \"Error foo.\", \"stdout\", stdout, \"stderr\", stderr)",
+		//},
+		//{
+		//	comment: quicktest.Commentf("errors.Wrapf with one named parameter"),
+		//	in:      "\treturn nil, errors.Wrapf(err, \"Foo, volume_id: %s\", *csi.VolumeId)",
+		//	out:     "\treturn nil, errkit.Wrap(err, \"Foo\", \"volume_id\", *csi.VolumeId)",
+		//},
 		//{
 		//	comment: quicktest.Commentf("Simple errors.Wrapf with multiple named parameters 1"),
 		//	in:      "\treturn errors.Wrapf(err, \"foo. app=%s name=%s\", a.name, a.dbSubnetGroup)",
@@ -131,11 +136,23 @@ func TestMatchers(t *testing.T) {
 		//	in:      "\treturn errors.Wrapf(err, \"foo. app=%s chart=%s release=%s\", c.name, c.chart.Chart, c.chart.Release)",
 		//	out:     "\treturn errkit.Wrap(err, \"foo.\", \"app\", c.name, \"chart\", c.chart.Chart, \"release\", c.chart.Release)",
 		//},
+		//{
+		//	comment: quicktest.Commentf("errors.Errorf with multiple named parameters 1"),
+		//	in:      "\treturn nil, errors.Errorf(\"Foo: volume_id=%s result_count=%d\", id, len(vols))",
+		//	out:     "\treturn nil, errkit.New(\"Foo\", \"volume_id\", id, \"result_count\", len(vols))",
+		//},
+		{
+			comment: quicktest.Commentf("errors.Errorf with multiple named parameters 2"),
+			in:      "\treturn nil, errors.Errorf(\"Required volume fields not available, volumeType: %s, Az: %s, VolumeTags: %v\", snapshot.Volume.VolumeType, snapshot.Volume.Az, snapshot.Volume.Tags)",
+			out:     "\treturn nil, errkit.New(\"Required volume fields not available\", \"volumeType\", snapshot.Volume.VolumeType, \"Az\", snapshot.Volume.Az, \"VolumeTags\", snapshot.Volume.Tags)",
+		},
 	}
 
 	c := quicktest.New(t)
 	for _, example := range examples {
-		result := matchAll(example.in)
-		c.Assert(result, quicktest.Equals, example.out, example.comment)
+		c.Run(example.comment.String(), func(c *quicktest.C) {
+			result := matchAll(example.in)
+			c.Assert(result, quicktest.Equals, example.out, example.comment)
+		})
 	}
 }
