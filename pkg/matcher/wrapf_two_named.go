@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	"mig/pkg/util"
 )
 
 // example
@@ -44,10 +46,26 @@ func matchWrapfWithThreeNamedParams(line string) string {
 	return fmt.Sprintf("%serrkit.Wrap(%s, \"%s\", \"%s\", %s, \"%s\", %s, \"%s\", %s)%s", match[1], match[3], match[4], match[5], match[8], match[6], match[9], match[7], match[10], match[11])
 }
 
+// example
+// return errors.Wrapf(err, "Waiting on snapshot %v", snap)
+// return nil, errors.Wrapf(err, "Snapshot %s did not complete", snapID)
+func matchWrapfWithImplicitParam(line string) string {
+	wrap := regexp.MustCompile(`(.*)errors.Wrapf\((.*),\s*"([^%]*?)(:?\s\%[a-z]{1})([^%]*)",\s*([a-zA-Z0-9.]+)\)(.*)`)
+	match := wrap.FindStringSubmatch(line)
+	if match == nil {
+		return ""
+	}
+
+	paramName := util.GuessParamName(match[3], match[6])
+
+	return fmt.Sprintf("%serrkit.Wrap(%s, \"%s%s\", \"%s\", %s)%s", match[1], match[2], match[3], match[5], paramName, match[6], match[7])
+}
+
 func MatchWrapfWithNamedParams(line string) string {
 	return MatchSequentially([]Matcher{
 		matchWrapfWithThreeNamedParams,
 		matchWrapfWithTwoNamedParams,
 		matchWrapfWithNamedParam,
+		matchWrapfWithImplicitParam,
 	}, line)
 }
