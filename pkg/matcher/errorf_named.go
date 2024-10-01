@@ -23,8 +23,31 @@ func matchErrorfWithoutParams(line string) string {
 // example
 // return nil, errors.Errorf("Found an unexpected number of volumes: volume_id=%s result_count=%d", id, len(vols))
 // return nil, errors.Errorf("Required volume fields not available, volumeType: %s, Az: %s", snapshot.Volume.VolumeType, snapshot.Volume.Az)
-
 func matchErrorfWithTwoNamedParams(line string) string {
+	res := matchErrorfWithTwoNamedParams1(line)
+	if res != "" {
+		return res
+	}
+
+	return matchErrorfWithTwoNamedParams2(line)
+}
+
+// example
+// return nil, errors.Errorf("Found an unexpected number of volumes: volume_id=%s result_count=%d", id, len(vols))
+func matchErrorfWithTwoNamedParams1(line string) string {
+	regex := regexp.MustCompile(`(.*)errors.Errorf\("(.+?)(?:[,:.]\s+|\s+)(\w+)(?:=|:)\s*%[sd]{1}[,\s]+(\w+)(?:=|:)\s*%[sd]{1}\s*",\s*([^,]+),\s*([^,]+)\)(.*)`)
+	match := regex.FindStringSubmatch(line)
+	if match == nil || strings.Contains(match[4], "%") || strings.Contains(match[4], "fmt.Sprintf") {
+		return ""
+	}
+
+	return fmt.Sprintf("%serrkit.New(\"%s\", \"%s\", %s, \"%s\", %s)%s", match[1], match[2], match[3], match[5], match[4], match[6], match[7])
+}
+
+// example
+// return nil, errors.Errorf("Found an unexpected number of volumes: volume_id=%s result_count=%d", id, len(vols))
+// return nil, errors.Errorf("Required volume fields not available, volumeType: %s, Az: %s", snapshot.Volume.VolumeType, snapshot.Volume.Az)
+func matchErrorfWithTwoNamedParams2(line string) string {
 	regex := regexp.MustCompile(`(.*)errors.Errorf\("(.+?)(?:[,:.]\s+|\s+)(\w+)(?:=|:)\s*%[sd]{1}[,\s]+(\w+)(?:=|:)\s*%[sd]{1}\s*",\s*([^,]+),\s*([^,]+)\)(.*)`)
 	match := regex.FindStringSubmatch(line)
 	if match == nil || strings.Contains(match[4], "%") || strings.Contains(match[4], "fmt.Sprintf") {

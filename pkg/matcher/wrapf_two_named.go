@@ -24,6 +24,7 @@ func matchWrapfWithNamedParam(line string) string {
 
 // example
 // return errors.Wrapf(err, "Failed to delete subnet group. You may need to delete it manually. app=%s name=%s", a.name, a.dbSubnetGroup)
+// return errors.Wrapf(err, "DiskCLient.CreateOrUpdate in VolumeCreateFromSnapshot, diskName: %s, snapshotID: %s", diskName, snapshot.ID)
 func matchWrapfWithTwoNamedParams(line string) string {
 	wrap := regexp.MustCompile(`(.*)errors.Wrapf\(((.*?), "(.*?)\s*([^.\s=]+)=\%s\s*([^.\s=]+)=\%s\s*",\s*([^,)]+),\s*([^,)]+))\)(.*)`)
 	match := wrap.FindStringSubmatch(line)
