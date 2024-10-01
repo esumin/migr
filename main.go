@@ -3,15 +3,14 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"mig/pkg/matcher"
+	"mig/pkg/migrator"
 )
 
-func TraverseAndModifyFiles(root string, matchers []matcher.Matcher) {
+func TraverseAndModifyFiles(root string, handlers migrator.MigrationHandlers) {
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if filepath.Ext(path) == ".go" {
 			fmt.Printf("Processing file: %s ...", path)
@@ -19,7 +18,9 @@ func TraverseAndModifyFiles(root string, matchers []matcher.Matcher) {
 			if err != nil {
 				return err
 			}
-			defer file.Close()
+			defer func() {
+				_ = file.Close()
+			}()
 
 			scanner := bufio.NewScanner(file)
 
@@ -28,8 +29,8 @@ func TraverseAndModifyFiles(root string, matchers []matcher.Matcher) {
 
 			for scanner.Scan() {
 				line := scanner.Text()
-				for _, matcher := range matchers {
-					modified := matcher(line)
+				for _, handler := range handlers {
+					modified := handler(line)
 					if modified != "" {
 						saveFile = true
 						line = modified
@@ -48,7 +49,7 @@ func TraverseAndModifyFiles(root string, matchers []matcher.Matcher) {
 			} else {
 				fmt.Printf(" changed\n")
 				// Now let's save builder content back to file
-				err := ioutil.WriteFile(path, []byte(result.String()), 0644)
+				err := os.WriteFile(path, []byte(result.String()), 0644)
 				if err != nil {
 					return err
 				}
@@ -62,13 +63,10 @@ func TraverseAndModifyFiles(root string, matchers []matcher.Matcher) {
 }
 
 func main() {
-	matchers := []matcher.Matcher{
-		matcher.MatchErrorfWithNamedParams,
-		matcher.MatchWrapfWithNamedParams,
-		matcher.MatchWrapfStderr,
-		matcher.MatchSimpleWraps,
-		matcher.MatchSimpleErrorsNew,
-		matcher.MatchImport,
+	matchers, err := migrator.GetMigratorHandlers(migrator.V1)
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 
 	TraverseAndModifyFiles(

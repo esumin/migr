@@ -1,15 +1,13 @@
-package matcher_test
+package matcher_v1_test
 
 import (
 	"testing"
 
 	"github.com/frankban/quicktest"
-
-	"mig/pkg/matcher"
 )
 
 func matchAll(line string) string {
-	for _, m := range matcher.AllMatchers {
+	for _, m := range matcher_v1.AllMatchers {
 		r := m(line)
 		if r != "" {
 			return r

@@ -1,4 +1,4 @@
-package matcher
+package matcher_v1
 
 type Matcher func(line string) string
 
