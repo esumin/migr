@@ -74,6 +74,11 @@ func TestHandleLine(t *testing.T) {
 			input:    `return errors.Errorf("Invalid secret name %s, it should not be of the form namespace/name )", repositoryPassword)`,
 			expected: `return errkit.New(fmt.Sprintf("Invalid secret name %s, it should not be of the form namespace/name )", repositoryPassword))`,
 		},
+		{
+			name:     "New to New",
+			input:    `		return errors.New(PasswordIncorrect)`,
+			expected: `		return errkit.New(PasswordIncorrect)`,
+		},
 	}
 
 	for _, tt := range tests {

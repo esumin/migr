@@ -48,19 +48,10 @@ func MatchOneVariableSimple(input []string) []string {
 	staticBefore = strings.TrimSpace(staticBefore)
 	staticAfter = strings.TrimSpace(staticAfter)
 
-	// Infer variable name from the last word before the placeholder
-	// Split the staticBefore into words and take the last one
-	words := strings.Fields(staticBefore)
-	if len(words) == 0 {
-		return nil
-	}
-	lastWord := words[len(words)-1]
-
-	// Remove any trailing punctuation from the last word
-	lastWord = strings.Trim(lastWord, ":/")
-
+	// Infer variable name from the last words before the placeholder and variable expression
+	lastWords := helpers.GetLastWords(staticBefore)
 	// Infer the variable name
-	varName := helpers.InferVariableName(lastWord)
+	varName := helpers.InferVariableName(lastWords, varExpr)
 
 	// If variable name is empty after inference, return nil
 	if varName == "" {

@@ -1,8 +1,9 @@
 package param_matcher_test
 
 import (
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	parammatcher "mig/pkg/migrator/matcher_v2/mutators/matcher"
 )
@@ -103,15 +104,22 @@ func TestMatchOneVariableSimple(t *testing.T) {
 				`cb.chart.Release`,
 			},
 		},
+		{
+			name:  "Parameter name constructed of two last words, should be taken as variable name",
+			input: []string{`"Error getting the pod and container name %s."`, "esi.name"},
+			expected: []string{
+				`"Error getting the pod and container name ."`,
+				`"containerName"`,
+				`esi.name`,
+			},
+		},
 	}
 
 	for _, tt := range tests {
 		tt := tt // Capture range variable
 		t.Run(tt.name, func(t *testing.T) {
 			result := parammatcher.MatchOneVariableSimple(tt.input)
-			if !reflect.DeepEqual(result, tt.expected) {
-				t.Errorf("MatchOneVariableSimple(%v) = %v; want %v", tt.input, result, tt.expected)
-			}
+			assert.Equal(t, tt.expected, result)
 		})
 	}
 }

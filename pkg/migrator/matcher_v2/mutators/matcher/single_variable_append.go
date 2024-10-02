@@ -49,13 +49,9 @@ func MatchSingleVariableAppend(input []string) []string {
 	// Trim any trailing spaces from the message
 	message = strings.TrimSpace(message)
 
+	lastWords := helpers.GetLastWords(message)
 	// Infer the variable label from the last word of the message
-	words := strings.Fields(message)
-	if len(words) == 0 {
-		return nil
-	}
-	lastWord := words[len(words)-1]
-	varLabel := helpers.InferVariableName(lastWord)
+	varLabel := helpers.InferVariableName(lastWords, varName)
 	if varLabel == "" {
 		return nil
 	}

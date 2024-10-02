@@ -35,6 +35,7 @@ var (
 var HandleWrap = getWrapHandler(wrapMatchers)
 var HandleWrapf = getWrapHandler(wrapfMatchers)
 var HandleErrorf = getNewHandler(errorfMatchers)
+var HandleNew = getNewHandler([]MatcherFn{})
 
 func getNewHandler(matchers []MatcherFn) func([]string) string {
 	return func(args []string) string {

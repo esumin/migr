@@ -10,6 +10,7 @@ var handlerMap = map[string]mutators.HandlerFunc{
 	"Wrap":   mutators.HandleWrap,
 	"Wrapf":  mutators.HandleWrapf,
 	"Errorf": mutators.HandleErrorf,
+	"New":    mutators.HandleNew,
 }
 
 // HandleLine receives a line of code and returns a transformed line.

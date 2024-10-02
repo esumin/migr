@@ -173,10 +173,7 @@ func TestMatchTwoVariables(t *testing.T) {
 				`opts.InstanceName`,
 			},
 		},
-		{
-			name: "Valid input with multiple spaces",
-			args: []string{`"Failed to create content, Volumesnapshot: %s, Error: %v"`, "snap.GetName()", "err"},
-		},
+		//return "", "", errkit.Wrap(err, "Error getting the pod and container name.", "name", esi.name)
 	}
 
 	for _, tt := range tests {

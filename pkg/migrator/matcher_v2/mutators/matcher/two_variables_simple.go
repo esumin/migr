@@ -46,8 +46,10 @@ func MatchTwoVariablesSimple(input []string) []string {
 	before := match[1]
 
 	// Extract variable names.
-	varName1 := helpers.InferVariableName(match[2])
-	varName2 := helpers.InferVariableName(match[3])
+	lastWords1 := []string{match[2]}
+	lastWords2 := []string{match[3]}
+	varName1 := helpers.InferVariableName(lastWords1, param1)
+	varName2 := helpers.InferVariableName(lastWords2, param2)
 
 	// Construct and return the resulting slice.
 	return []string{
