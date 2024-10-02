@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"mig/pkg/helpers"
+	"mig/pkg/migrator/matcher_v2/helpers"
 )
 
 // MatchOneVariableSimple takes a slice of strings and matches the first element
@@ -48,11 +48,6 @@ func MatchOneVariableSimple(input []string) []string {
 	staticBefore = strings.TrimSpace(staticBefore)
 	staticAfter = strings.TrimSpace(staticAfter)
 
-	// Combine the static parts, ensuring proper spacing
-	if staticAfter != "" {
-		staticBefore = staticBefore + " " + staticAfter
-	}
-
 	// Infer variable name from the last word before the placeholder
 	// Split the staticBefore into words and take the last one
 	words := strings.Fields(staticBefore)
@@ -65,11 +60,16 @@ func MatchOneVariableSimple(input []string) []string {
 	lastWord = strings.Trim(lastWord, ":/")
 
 	// Infer the variable name
-	varName := helpers.InverVariableName(lastWord)
+	varName := helpers.InferVariableName(lastWord)
 
 	// If variable name is empty after inference, return nil
 	if varName == "" {
 		return nil
+	}
+
+	// Now, combine the static parts, ensuring proper spacing
+	if staticAfter != "" {
+		staticBefore = staticBefore + " " + staticAfter
 	}
 
 	// Construct and return the resulting slice

@@ -3,7 +3,7 @@ package parser_test
 import (
 	"testing"
 
-	"mig/pkg/migrator/parser"
+	"mig/pkg/migrator/matcher_v2/parser"
 )
 
 func TestParseLine(t *testing.T) {

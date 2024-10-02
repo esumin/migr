@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	parammatcher "mig/pkg/migrator/mutators/matcher"
+	parammatcher "mig/pkg/migrator/matcher_v2/mutators/matcher"
 )
 
 func TestMatchOneVariableSimple(t *testing.T) {
@@ -81,6 +81,27 @@ func TestMatchOneVariableSimple(t *testing.T) {
 				`n[0]`,
 			},
 			expected: nil, // Expecting no match
+		},
+		{
+			name: "Parameter is in the middle of text, name should be taken as usually from word before placeholder",
+			input: []string{
+				`"Error waiting for application %s to be ready to reset it"`,
+				"c.name",
+			},
+			expected: []string{
+				`"Error waiting for application to be ready to reset it"`,
+				`"application"`,
+				`c.name`,
+			},
+		},
+		{
+			name:  "Parameter name blacklist, should not be taken as variable name",
+			input: []string{`"Failed to uninstall %s helm release"`, "cb.chart.Release"},
+			expected: []string{
+				`"Failed to uninstall helm release"`,
+				`"release"`,
+				`cb.chart.Release`,
+			},
 		},
 	}
 

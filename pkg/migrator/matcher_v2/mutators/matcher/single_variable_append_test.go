@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	parammatcher "mig/pkg/migrator/mutators/matcher"
+	parammatcher "mig/pkg/migrator/matcher_v2/mutators/matcher"
 )
 
 func TestMatchSingleVariableAppend(t *testing.T) {

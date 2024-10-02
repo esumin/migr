@@ -1,10 +1,11 @@
 package param_matcher_test
 
 import (
-	"reflect"
 	"testing"
 
-	param_matcher "mig/pkg/migrator/mutators/matcher"
+	"github.com/stretchr/testify/assert"
+
+	"mig/pkg/migrator/matcher_v2/mutators/matcher"
 )
 
 func TestMatchTwoVariables(t *testing.T) {
@@ -22,9 +23,9 @@ func TestMatchTwoVariables(t *testing.T) {
 			},
 			expected: []string{
 				`"Failed to create pod. Failed to override pod specs."`,
-				`"Namespace"`,
+				`"namespace"`,
 				`opts.Namespace`,
-				`"NameFmt"`,
+				`"nameFmt"`,
 				`opts.GenerateName`,
 			},
 		},
@@ -37,9 +38,9 @@ func TestMatchTwoVariables(t *testing.T) {
 			},
 			expected: []string{
 				`"Failed to create pod. Failed to override pod specs."`,
-				`"Namespace"`,
+				`"namespace"`,
 				`opts.Namespace`,
-				`"NameFmt"`,
+				`"nameFmt"`,
 				`opts.GenerateName`,
 			},
 		},
@@ -52,9 +53,9 @@ func TestMatchTwoVariables(t *testing.T) {
 			},
 			expected: []string{
 				`"Error encountered."`,
-				`"Namespace"`,
+				`"namespace"`,
 				`opts.Namespace`,
-				`"ServiceName"`,
+				`"serviceName"`,
 				`opts.ServiceName`,
 			},
 		},
@@ -121,9 +122,9 @@ func TestMatchTwoVariables(t *testing.T) {
 			},
 			expected: []string{
 				`"Deployment failed."`,
-				`"Region"`,
+				`"region"`,
 				`opts.Region`,
-				`"ClusterName"`,
+				`"clusterName"`,
 				`opts.ClusterName`,
 			},
 		},
@@ -136,9 +137,9 @@ func TestMatchTwoVariables(t *testing.T) {
 			},
 			expected: []string{
 				`"Operation failed."`,
-				`"Zone"`,
+				`"zone"`,
 				`opts.Zone`,
-				`"InstanceName"`,
+				`"instanceName"`,
 				`opts.InstanceName`,
 			},
 		},
@@ -151,9 +152,9 @@ func TestMatchTwoVariables(t *testing.T) {
 			},
 			expected: []string{
 				`"Operation failed."`,
-				`"Zone"`,
+				`"zone"`,
 				`opts.Zone`,
-				`"InstanceName"`,
+				`"instanceName"`,
 				`opts.InstanceName`,
 			},
 		},
@@ -166,11 +167,15 @@ func TestMatchTwoVariables(t *testing.T) {
 			},
 			expected: []string{
 				`"Operation failed."`,
-				`"Zone"`,
+				`"zone"`,
 				`opts.Zone`,
-				`"InstanceName"`,
+				`"instanceName"`,
 				`opts.InstanceName`,
 			},
+		},
+		{
+			name: "Valid input with multiple spaces",
+			args: []string{`"Failed to create content, Volumesnapshot: %s, Error: %v"`, "snap.GetName()", "err"},
 		},
 	}
 
@@ -178,9 +183,10 @@ func TestMatchTwoVariables(t *testing.T) {
 		tt := tt // Capture range variable
 		t.Run(tt.name, func(t *testing.T) {
 			result := param_matcher.MatchTwoVariablesSimple(tt.input)
-			if !reflect.DeepEqual(result, tt.expected) {
-				t.Errorf("MatchTwoVariablesSimple(%v) = %v; want %v", tt.input, result, tt.expected)
-			}
+			assert.Equal(t, tt.expected, result)
+			//if !reflect.DeepEqual(result, tt.expected) {
+			//	t.Errorf("MatchTwoVariablesSimple(%v) = %v; want %v", tt.input, result, tt.expected)
+			//}
 		})
 	}
 }

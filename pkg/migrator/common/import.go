@@ -1,4 +1,4 @@
-package matcher_v1
+package matcher_common
 
 import (
 	"strings"

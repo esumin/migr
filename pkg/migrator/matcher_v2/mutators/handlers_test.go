@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"mig/pkg/migrator/mutators"
+	"mig/pkg/migrator/matcher_v2/mutators"
 )
 
 func TestHandleWrap(t *testing.T) {
@@ -76,15 +76,51 @@ func TestHandleWrapf(t *testing.T) {
 			expected: `errkit.Wrap(err, message)`,
 		},
 		{
-			name:     "Wrapf with multiple variables",
-			args:     []string{"err", `"Could not update Deployment{Namespace %s, Name: %s}", namespace, name`},
+			name:     "Wrapf with multiple variables - 1",
+			args:     []string{"err", `"Could not update Deployment{Namespace %s, Name: %s}"`, "namespace", "name"},
 			expected: `errkit.Wrap(err, "Could not update Deployment", "namespace", namespace, "name", name)`,
+		},
+		{
+			name:     "Wrapf with multiple variables - 2",
+			args:     []string{"err", `"Failed to get pod from podOptions. Namespace: %s, NameFmt: %s"`, "opts.Namespace", "opts.GenerateName"},
+			expected: `errkit.Wrap(err, "Failed to get pod from podOptions.", "namespace", opts.Namespace, "nameFmt", opts.GenerateName)`,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := mutators.HandleWrapf(tt.args)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestHandleErrorf(t *testing.T) {
+	tests := []struct {
+		name     string
+		args     []string
+		expected string
+	}{
+		{
+			name:     "Simple Errorf",
+			args:     []string{`"Failed to get source"`},
+			expected: `errkit.New("Failed to get source")`,
+		},
+		{
+			name:     "Errorf with two parameters - 1",
+			args:     []string{`"Pod %s failed. Pod status: %s"`, "name", "p.Status.String()"},
+			expected: `errkit.New(fmt.Sprintf("Pod %s failed. Pod status: %s", name, p.Status.String()))`,
+		},
+		{
+			name:     "Errorf with two parameters - 2",
+			args:     []string{`"Failed to create content, Volumesnapshot: %s, Error: %v"`, "snap.GetName()", "err"},
+			expected: `errkit.New(fmt.Sprintf("Failed to create content, Volumesnapshot: %s, Error: %v", snap.GetName(), err))`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := mutators.HandleErrorf(tt.args)
 			assert.Equal(t, tt.expected, got)
 		})
 	}

@@ -1,10 +1,8 @@
-package migrator
+package mutators
 
 import (
 	"fmt"
 	"strings"
-
-	"mig/pkg/migrator/mutators"
 )
 
 // HandlerFunc is the handler function type
@@ -12,14 +10,6 @@ type HandlerFunc func(args []string) string
 
 // HandlerMap is a map from function names to their corresponding handler functions.
 type HandlerMap map[string]HandlerFunc
-
-// Define the handler map using the HandlerFunc type
-var handlerMap = map[string]HandlerFunc{
-	"Wrap":   mutators.HandleWrap,
-	"Wrapf":  handleWrapf,
-	"New":    handleNew,
-	"Errorf": handleErrorf,
-}
 
 // Mutator takes the errorsPart and a handlerMap, parses it to extract the function name and arguments,
 // and dispatches it to the appropriate handler function using the handlerMap.

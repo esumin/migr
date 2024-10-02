@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"mig/pkg/helpers"
+	"mig/pkg/migrator/matcher_v2/helpers"
 )
 
 // MatchSingleVariableAppend matches templates where a single variable is appended to the message
@@ -55,7 +55,7 @@ func MatchSingleVariableAppend(input []string) []string {
 		return nil
 	}
 	lastWord := words[len(words)-1]
-	varLabel := helpers.InverVariableName(lastWord)
+	varLabel := helpers.InferVariableName(lastWord)
 	if varLabel == "" {
 		return nil
 	}

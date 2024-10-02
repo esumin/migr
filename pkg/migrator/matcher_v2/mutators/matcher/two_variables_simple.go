@@ -2,6 +2,8 @@ package param_matcher
 
 import (
 	"regexp"
+
+	"mig/pkg/migrator/matcher_v2/helpers"
 )
 
 // MatchTwoVariablesSimple takes a slice of strings and matches the first element
@@ -44,8 +46,8 @@ func MatchTwoVariablesSimple(input []string) []string {
 	before := match[1]
 
 	// Extract variable names.
-	varName1 := match[2]
-	varName2 := match[3]
+	varName1 := helpers.InferVariableName(match[2])
+	varName2 := helpers.InferVariableName(match[3])
 
 	// Construct and return the resulting slice.
 	return []string{

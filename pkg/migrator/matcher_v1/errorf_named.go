@@ -76,11 +76,11 @@ var a = 0
 // example
 // return "", errors.Errorf("no zones specified, zone: %s", az)
 func matchErrorfWithImplicitParam(line string) string {
-	fmt.Println("11111")
-	a++
-	if a == 274 {
-		fmt.Println("22222")
-	}
+	//fmt.Println("11111")
+	//a++
+	//if a == 274 {
+	//	fmt.Println("22222")
+	//}
 	wrap := regexp.MustCompile(`(.*)errors.Errorf\("([^%]*?)(:?\s\%[a-z]{1})([^%]*)",\s*([a-zA-Z0-9.]+)\)(.*)`)
 	match := wrap.FindStringSubmatch(line)
 	if match == nil {

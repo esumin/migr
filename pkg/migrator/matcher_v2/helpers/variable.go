@@ -2,10 +2,10 @@ package helpers
 
 import "strings"
 
-// InverVariableName infers the variable name from the given word.
+// InferVariableName infers the variable name from the given word.
 // If the word starts with multiple uppercase letters, it retains the capitalization.
 // Otherwise, it decapitalizes only the first letter.
-func InverVariableName(word string) string {
+func InferVariableName(word string) string {
 	if len(word) == 0 {
 		return ""
 	}

@@ -1,76 +1,32 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"mig/pkg/migrator"
+	"mig/pkg/traverser"
 )
 
-func TraverseAndModifyFiles(root string, handlers migrator.MigrationHandlers) {
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if filepath.Ext(path) == ".go" {
-			fmt.Printf("Processing file: %s ...", path)
-			file, err := os.Open(path)
-			if err != nil {
-				return err
-			}
-			defer func() {
-				_ = file.Close()
-			}()
-
-			scanner := bufio.NewScanner(file)
-
-			result := strings.Builder{}
-			saveFile := false
-
-			for scanner.Scan() {
-				line := scanner.Text()
-				for _, handler := range handlers {
-					modified := handler(line)
-					if modified != "" {
-						saveFile = true
-						line = modified
-						break
-					}
-				}
-				result.WriteString(line + "\n")
-			}
-
-			if err := scanner.Err(); err != nil {
-				return err
-			}
-
-			if !saveFile {
-				fmt.Printf(" no changes\n")
-			} else {
-				fmt.Printf(" changed\n")
-				// Now let's save builder content back to file
-				err := os.WriteFile(path, []byte(result.String()), 0644)
-				if err != nil {
-					return err
-				}
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		fmt.Printf("error walking the path %v: %v\n", root, err)
-	}
-}
-
 func main() {
-	matchers, err := migrator.GetMigratorHandlers(migrator.V1)
+	// Check if a path is provided in the command line arguments
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: myapp <path>")
+		return
+	}
+
+	// Get the path from the command line arguments
+	path := os.Args[1]
+
+	matchers, err := migrator.GetMigratorHandlers(migrator.V2)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	TraverseAndModifyFiles(
-		"/Users/eugen.sumin/git/kanister/pkg/blockstorage",
+	// Pass the command line path to the TraverseAndModifyFiles function
+	traverser.TraverseAndModifyFiles(
+		path,
 		matchers,
 	)
 }

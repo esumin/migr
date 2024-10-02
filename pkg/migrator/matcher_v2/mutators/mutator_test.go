@@ -1,12 +1,12 @@
 // migrator/mutator_test.go
-package migrator_test
+package mutators_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"mig/pkg/migrator"
+	matcher "mig/pkg/migrator/matcher_v2/mutators"
 )
 
 func TestMutator(t *testing.T) {
@@ -66,17 +66,24 @@ func TestMutator(t *testing.T) {
 			expectedHandlerArgs:   []string{"\"Simple error message\""},
 			expectedHandlerOutput: "aaa",
 		},
+		{
+			name:                  "Wrapf with multiple named arguments 1",
+			errorsPart:            `errors.Wrapf(err, "Failed to get pod from podOptions. Namespace: %s, NameFmt: %s", opts.Namespace, opts.GenerateName)`,
+			expectedHandlerName:   "Wrapf",
+			expectedHandlerArgs:   []string{"err", `"Failed to get pod from podOptions. Namespace: %s, NameFmt: %s"`, "opts.Namespace", "opts.GenerateName"},
+			expectedHandlerOutput: "aaa",
+		},
 	}
 
-	getHandler := func(invokedArgs map[string][][]string, handlerName string, output string) migrator.HandlerFunc {
+	getHandler := func(invokedArgs map[string][][]string, handlerName string, output string) matcher.HandlerFunc {
 		return func(args []string) string {
 			invokedArgs[handlerName] = append(invokedArgs[handlerName], args)
 			return output
 		}
 	}
 
-	getHandlerMap := func(invokedArgs map[string][][]string, tc testCase) migrator.HandlerMap {
-		return migrator.HandlerMap{
+	getHandlerMap := func(invokedArgs map[string][][]string, tc testCase) matcher.HandlerMap {
+		return matcher.HandlerMap{
 			tc.expectedHandlerName: getHandler(invokedArgs, tc.expectedHandlerName, tc.expectedHandlerOutput),
 		}
 	}
@@ -90,7 +97,7 @@ func TestMutator(t *testing.T) {
 			handlerMap := getHandlerMap(invokedArgs, tc)
 
 			// Call Mutator with the errorsPart and the handlerMap
-			got := migrator.Mutator(tc.errorsPart, handlerMap)
+			got := matcher.Mutator(tc.errorsPart, handlerMap)
 			assert.Equal(t, tc.expectedHandlerOutput, got, "Mutator returned incorrect output")
 			if tc.expectedHandlerName != "" {
 				assert.Equal(t, len(invokedArgs[tc.expectedHandlerName]), 1, "Handler should be invoked exactly once")
