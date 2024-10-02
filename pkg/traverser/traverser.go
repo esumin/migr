@@ -12,6 +12,10 @@ import (
 
 func TraverseAndModifyFiles(root string, handlers migrator.MigrationHandlers) {
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
 		if info.IsDir() {
 			if strings.HasPrefix(info.Name(), ".") {
 				return nil // Skip hidden directories
